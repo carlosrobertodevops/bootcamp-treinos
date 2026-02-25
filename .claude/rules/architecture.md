@@ -1,3 +1,7 @@
+## Git
+
+- **SEMPRE** use [Conventional Commits](https://www.conventionalcommits.org/) para mensagens de commit. Exemplo: `feat: add start workout session endpoint`, `fix: workout plan validation`, `docs: update architecture rules`.
+
 ## Fastify: Rotas de API
 
 - **SEMPRE** siga os princípios do REST para criar rotas. Exemplo: `GET /workout-plans`, `GET /workout-plans/:id/days`.
@@ -10,6 +14,7 @@
 - Quando uma rota precisar ser protegida (acessível apenas por usuários autenticados), **SEMPRE** use o `auth.api.getSession` (@src/lib/auth.ts) para recuperar a sessão do usuário.
 - Uma rota deve **SEMPRE** instanciar e chamar um use case.
 - **SEMPRE** trate os erros lançados pelo use case.
+- **SEMPRE** inclua `tags` e `summary` no schema da rota para documentação no Swagger/OpenAPI.
 
 ### Exemplo:
 
@@ -28,6 +33,8 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
     method: "POST",
     url: "/",
     schema: {
+      tags: ["Workout Plan"],
+      summary: "Create a workout plan",
       body: WorkoutPlanSchema.omit({ id: true }),
       response: {
         201: WorkoutPlanSchema,
