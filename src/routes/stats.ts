@@ -1,19 +1,19 @@
-import { fromNodeHeaders } from "better-auth/node";
-import { FastifyInstance } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { fromNodeHeaders } from 'better-auth/node'
+import { FastifyInstance } from 'fastify'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
-import { NotFoundError } from "../errors/index.js";
-import { auth } from "../lib/auth.js";
-import { ErrorSchema, StatsQuerySchema, StatsSchema } from "../schemas/index.js";
-import { GetStats } from "../usecases/GetStats.js";
+import { NotFoundError } from '../errors/index.js'
+import { auth } from '../lib/auth.js'
+import { ErrorSchema, StatsQuerySchema, StatsSchema } from '../schemas/index.js'
+import { GetStats } from '../usecases/GetStats.js'
 
 export const statsRoutes = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().route({
-    method: "GET",
-    url: "/",
+    method: 'GET',
+    url: '/',
     schema: {
-      tags: ["Stats"],
-      summary: "Get user workout stats",
+      tags: ['Stats'],
+      summary: 'Get user workout stats',
       querystring: StatsQuerySchema,
       response: {
         200: StatsSchema,
@@ -26,37 +26,37 @@ export const statsRoutes = async (app: FastifyInstance) => {
       try {
         const session = await auth.api.getSession({
           headers: fromNodeHeaders(request.headers),
-        });
+        })
         if (!session) {
           return reply.status(401).send({
-            error: "Unauthorized",
-            code: "UNAUTHORIZED",
-          });
+            error: 'Unauthorized',
+            code: 'UNAUTHORIZED',
+          })
         }
 
-        const getStats = new GetStats();
+        const getStats = new GetStats()
         const result = await getStats.execute({
           userId: session.user.id,
           from: request.query.from,
           to: request.query.to,
-        });
+        })
 
-        return reply.status(200).send(result);
+        return reply.status(200).send(result)
       } catch (error) {
-        app.log.error(error);
+        app.log.error(error)
 
         if (error instanceof NotFoundError) {
           return reply.status(404).send({
             error: error.message,
-            code: "NOT_FOUND_ERROR",
-          });
+            code: 'NOT_FOUND_ERROR',
+          })
         }
 
         return reply.status(500).send({
-          error: "Internal server error",
-          code: "INTERNAL_SERVER_ERROR",
-        });
+          error: 'Internal server error',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
       }
     },
-  });
-};
+  })
+}

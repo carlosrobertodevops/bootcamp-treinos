@@ -1,31 +1,31 @@
-import { WeekDay } from "../generated/prisma/enums.js";
-import { prisma } from "../lib/db.js";
+import { WeekDay } from '../generated/prisma/enums.js'
+import { prisma } from '../lib/db.js'
 
 interface InputDto {
-  userId: string;
-  active?: boolean;
+  userId: string
+  active?: boolean
 }
 
 interface OutputDto {
-  id: string;
-  name: string;
-  isActive: boolean;
+  id: string
+  name: string
+  isActive: boolean
   workoutDays: Array<{
-    id: string;
-    name: string;
-    weekDay: WeekDay;
-    isRest: boolean;
-    estimatedDurationInSeconds: number;
-    coverImageUrl?: string;
+    id: string
+    name: string
+    weekDay: WeekDay
+    isRest: boolean
+    estimatedDurationInSeconds: number
+    coverImageUrl?: string
     exercises: Array<{
-      id: string;
-      order: number;
-      name: string;
-      sets: number;
-      reps: number;
-      restTimeInSeconds: number;
-    }>;
-  }>;
+      id: string
+      order: number
+      name: string
+      sets: number
+      reps: number
+      restTimeInSeconds: number
+    }>
+  }>
 }
 
 export class ListWorkoutPlans {
@@ -38,12 +38,12 @@ export class ListWorkoutPlans {
       include: {
         workoutDays: {
           include: {
-            exercises: { orderBy: { order: "asc" } },
+            exercises: { orderBy: { order: 'asc' } },
           },
         },
       },
-      orderBy: { createdAt: "desc" },
-    });
+      orderBy: { createdAt: 'desc' },
+    })
 
     return workoutPlans.map((plan) => ({
       id: plan.id,
@@ -65,6 +65,6 @@ export class ListWorkoutPlans {
           restTimeInSeconds: exercise.restTimeInSeconds,
         })),
       })),
-    }));
+    }))
   }
 }

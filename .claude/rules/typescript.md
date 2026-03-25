@@ -1,6 +1,6 @@
 ---
 paths:
-  - "**/*.ts"
+  - '**/*.ts'
 ---
 
 # Regras TypeScript

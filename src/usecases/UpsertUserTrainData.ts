@@ -1,19 +1,19 @@
-import { prisma } from "../lib/db.js";
+import { prisma } from '../lib/db.js'
 
 interface InputDto {
-  userId: string;
-  weightInGrams: number;
-  heightInCentimeters: number;
-  age: number;
-  bodyFatPercentage: number;
+  userId: string
+  weightInGrams: number
+  heightInCentimeters: number
+  age: number
+  bodyFatPercentage: number
 }
 
 interface OutputDto {
-  userId: string;
-  weightInGrams: number;
-  heightInCentimeters: number;
-  age: number;
-  bodyFatPercentage: number;
+  userId: string
+  weightInGrams: number
+  heightInCentimeters: number
+  age: number
+  bodyFatPercentage: number
 }
 
 export class UpsertUserTrainData {
@@ -26,7 +26,7 @@ export class UpsertUserTrainData {
         age: dto.age,
         bodyFatPercentage: dto.bodyFatPercentage,
       },
-    });
+    })
 
     return {
       userId: user.id,
@@ -34,6 +34,6 @@ export class UpsertUserTrainData {
       heightInCentimeters: user.heightInCentimeters!,
       age: user.age!,
       bodyFatPercentage: user.bodyFatPercentage!,
-    };
+    }
   }
 }

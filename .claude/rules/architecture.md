@@ -21,22 +21,22 @@
 ### Exemplo:
 
 ```ts
-import { fromNodeHeaders } from "better-auth/node";
-import { FastifyInstance } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { fromNodeHeaders } from 'better-auth/node'
+import { FastifyInstance } from 'fastify'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
-import { NotFoundError } from "../errors/index.js";
-import { auth } from "../lib/auth.js";
-import { ErrorSchema, WorkoutPlanSchema } from "../schemas/index.js";
-import { CreateWorkoutPlan } from "../usecases/CreateWorkoutPlan.js";
+import { NotFoundError } from '../errors/index.js'
+import { auth } from '../lib/auth.js'
+import { ErrorSchema, WorkoutPlanSchema } from '../schemas/index.js'
+import { CreateWorkoutPlan } from '../usecases/CreateWorkoutPlan.js'
 
 export const workoutPlanRoutes = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().route({
-    method: "POST",
-    url: "/",
+    method: 'POST',
+    url: '/',
     schema: {
-      tags: ["Workout Plan"],
-      summary: "Create a workout plan",
+      tags: ['Workout Plan'],
+      summary: 'Create a workout plan',
       body: WorkoutPlanSchema.omit({ id: true }),
       response: {
         201: WorkoutPlanSchema,
@@ -50,36 +50,36 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
       try {
         const session = await auth.api.getSession({
           headers: fromNodeHeaders(request.headers),
-        });
+        })
         if (!session) {
           return reply.status(401).send({
-            error: "Unauthorized",
-            code: "UNAUTHORIZED",
-          });
+            error: 'Unauthorized',
+            code: 'UNAUTHORIZED',
+          })
         }
-        const createWorkoutPlan = new CreateWorkoutPlan();
+        const createWorkoutPlan = new CreateWorkoutPlan()
         const result = await createWorkoutPlan.execute({
           userId: session.user.id,
           name: request.body.name,
           workoutDays: request.body.workoutDays,
-        });
-        return reply.status(201).send(result);
+        })
+        return reply.status(201).send(result)
       } catch (error) {
-        app.log.error(error);
+        app.log.error(error)
         if (error instanceof NotFoundError) {
           return reply.status(404).send({
             error: error.message,
-            code: "NOT_FOUND_ERROR",
-          });
+            code: 'NOT_FOUND_ERROR',
+          })
         }
         return reply.status(500).send({
-          error: "Internal server error",
-          code: "INTERNAL_SERVER_ERROR",
-        });
+          error: 'Internal server error',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
       }
     },
-  });
-};
+  })
+}
 ```
 
 ## Use Cases
@@ -97,45 +97,45 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
 ### Exemplo:
 
 ```ts
-import { NotFoundError } from "../errors/index.js";
-import { WeekDay } from "../generated/prisma/enums.js";
-import { prisma } from "../lib/db.js";
+import { NotFoundError } from '../errors/index.js'
+import { WeekDay } from '../generated/prisma/enums.js'
+import { prisma } from '../lib/db.js'
 
 // Data Transfer Object
 interface InputDto {
-  userId: string;
-  name: string;
+  userId: string
+  name: string
   workoutDays: Array<{
-    name: string;
-    weekDay: WeekDay;
-    isRest: boolean;
-    estimatedDurationInSeconds: number;
+    name: string
+    weekDay: WeekDay
+    isRest: boolean
+    estimatedDurationInSeconds: number
     exercises: Array<{
-      order: number;
-      name: string;
-      sets: number;
-      reps: number;
-      restTimeInSeconds: number;
-    }>;
-  }>;
+      order: number
+      name: string
+      sets: number
+      reps: number
+      restTimeInSeconds: number
+    }>
+  }>
 }
 
 interface OutputDto {
-  id: string;
-  name: string;
+  id: string
+  name: string
   workoutDays: Array<{
-    name: string;
-    weekDay: WeekDay;
-    isRest: boolean;
-    estimatedDurationInSeconds: number;
+    name: string
+    weekDay: WeekDay
+    isRest: boolean
+    estimatedDurationInSeconds: number
     exercises: Array<{
-      order: number;
-      name: string;
-      sets: number;
-      reps: number;
-      restTimeInSeconds: number;
-    }>;
-  }>;
+      order: number
+      name: string
+      sets: number
+      reps: number
+      restTimeInSeconds: number
+    }>
+  }>
 }
 
 export class CreateWorkoutPlan {
@@ -144,14 +144,14 @@ export class CreateWorkoutPlan {
       where: {
         isActive: true,
       },
-    });
+    })
     // Transaction - Atomicidade
     return prisma.$transaction(async (tx) => {
       if (existingWorkoutPlan) {
         await tx.workoutPlan.update({
           where: { id: existingWorkoutPlan.id },
           data: { isActive: false },
-        });
+        })
       }
       const workoutPlan = await tx.workoutPlan.create({
         data: {
@@ -177,7 +177,7 @@ export class CreateWorkoutPlan {
             })),
           },
         },
-      });
+      })
       const result = await tx.workoutPlan.findUnique({
         where: { id: workoutPlan.id },
         include: {
@@ -187,9 +187,9 @@ export class CreateWorkoutPlan {
             },
           },
         },
-      });
+      })
       if (!result) {
-        throw new NotFoundError("Workout plan not found");
+        throw new NotFoundError('Workout plan not found')
       }
       return {
         id: result.id,
@@ -207,8 +207,8 @@ export class CreateWorkoutPlan {
             restTimeInSeconds: exercise.restTimeInSeconds,
           })),
         })),
-      };
-    });
+      }
+    })
   }
 }
 ```

@@ -11,9 +11,9 @@ export default defineConfig([
     ignores: ['dist/**', 'node_modules/**', 'src/generated/**'],
   },
   {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     plugins: { js },
-    extends: ["js/recommended"],
+    extends: ['js/recommended'],
     languageOptions: { globals: globals.node },
   },
   js.configs.recommended,
@@ -37,4 +37,4 @@ export default defineConfig([
     },
   },
   eslintConfigPrettier,
-]);
+])

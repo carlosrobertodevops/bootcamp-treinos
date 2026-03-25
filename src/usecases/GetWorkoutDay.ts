@@ -1,62 +1,62 @@
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc.js";
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
 
-import { NotFoundError } from "../errors/index.js";
-import { WeekDay } from "../generated/prisma/enums.js";
-import { prisma } from "../lib/db.js";
+import { NotFoundError } from '../errors/index.js'
+import { WeekDay } from '../generated/prisma/enums.js'
+import { prisma } from '../lib/db.js'
 
-dayjs.extend(utc);
+dayjs.extend(utc)
 
 interface InputDto {
-  userId: string;
-  workoutPlanId: string;
-  workoutDayId: string;
+  userId: string
+  workoutPlanId: string
+  workoutDayId: string
 }
 
 interface OutputDto {
-  id: string;
-  name: string;
-  isRest: boolean;
-  coverImageUrl?: string;
-  estimatedDurationInSeconds: number;
-  weekDay: WeekDay;
+  id: string
+  name: string
+  isRest: boolean
+  coverImageUrl?: string
+  estimatedDurationInSeconds: number
+  weekDay: WeekDay
   exercises: Array<{
-    id: string;
-    name: string;
-    order: number;
-    workoutDayId: string;
-    sets: number;
-    reps: number;
-    restTimeInSeconds: number;
-  }>;
+    id: string
+    name: string
+    order: number
+    workoutDayId: string
+    sets: number
+    reps: number
+    restTimeInSeconds: number
+  }>
   sessions: Array<{
-    id: string;
-    workoutDayId: string;
-    startedAt?: string;
-    completedAt?: string;
-  }>;
+    id: string
+    workoutDayId: string
+    startedAt?: string
+    completedAt?: string
+  }>
 }
 
 export class GetWorkoutDay {
   async execute(dto: InputDto): Promise<OutputDto> {
     const workoutPlan = await prisma.workoutPlan.findUnique({
       where: { id: dto.workoutPlanId },
-    });
+    })
 
     if (!workoutPlan || workoutPlan.userId !== dto.userId) {
-      throw new NotFoundError("Workout plan not found");
+      throw new NotFoundError('Workout plan not found')
     }
 
     const workoutDay = await prisma.workoutDay.findUnique({
       where: { id: dto.workoutDayId, workoutPlanId: dto.workoutPlanId },
       include: {
-        exercises: { orderBy: { order: "asc" } },
+        exercises: { orderBy: { order: 'asc' } },
         sessions: true,
       },
-    });
+    })
 
     if (!workoutDay) {
-      throw new NotFoundError("Workout day not found");
+      throw new NotFoundError('Workout day not found')
     }
 
     return {
@@ -78,11 +78,11 @@ export class GetWorkoutDay {
       sessions: workoutDay.sessions.map((session) => ({
         id: session.id,
         workoutDayId: session.workoutDayId,
-        startedAt: dayjs.utc(session.startedAt).format("YYYY-MM-DD"),
+        startedAt: dayjs.utc(session.startedAt).format('YYYY-MM-DD'),
         completedAt: session.completedAt
-          ? dayjs.utc(session.completedAt).format("YYYY-MM-DD")
+          ? dayjs.utc(session.completedAt).format('YYYY-MM-DD')
           : undefined,
       })),
-    };
+    }
   }
 }

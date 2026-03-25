@@ -36,7 +36,7 @@ interface Query {}
 
 ```ts
 interface StatusCode201 {
-  userWorkoutSessionId: string;
+  userWorkoutSessionId: string
 }
 ```
 
